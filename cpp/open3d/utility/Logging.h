@@ -22,6 +22,8 @@
 #include <fmt/printf.h>
 #include <fmt/ranges.h>
 
+#include <type_traits>
+
 #define DEFAULT_IO_BUFFER_SIZE 1024
 
 #include "open3d/Macro.h"
@@ -259,3 +261,16 @@ private:
 
 }  // namespace utility
 }  // namespace open3d
+
+// Version v10 of fmt library does not have a formatter for enums.
+// See: https://github.com/fmtlib/fmt/issues/3720
+template <typename EnumType>
+struct fmt::formatter<EnumType, std::enable_if_t<std::is_enum<EnumType>::value, char>> : fmt::formatter<int>
+{
+    auto format(const EnumType& enumValue, format_context& ctx) const
+    {
+        return fmt::formatter<int>::format(
+            static_cast<int>(enumValue), ctx);
+    }
+};
+

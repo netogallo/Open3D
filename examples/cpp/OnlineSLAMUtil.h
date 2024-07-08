@@ -619,8 +619,9 @@ protected:
                         surface_.pcd.HasPointPositions()
                                 ? surface_.pcd.GetPointPositions().GetLength()
                                 : 0;
+		int estimated_points = prop_values_.estimated_points;
                 info << fmt::format("Surface points: {}/{}\n", len,
-                                    prop_values_.estimated_points)
+                                    estimated_points)
                      << "\n";
             }
 

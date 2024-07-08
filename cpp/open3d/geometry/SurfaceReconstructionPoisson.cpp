@@ -26,12 +26,12 @@
 // 4245: signed/unsigned mismatch
 // 4189: local variable is initialized but not referenced
 #endif
-#include "PoissonRecon/Src/PreProcessor.h"
-#include "PoissonRecon/Src/MyMiscellany.h"
-#include "PoissonRecon/Src/CmdLineParser.h"
-#include "PoissonRecon/Src/FEMTree.h"
-#include "PoissonRecon/Src/PPolynomial.h"
-#include "PoissonRecon/Src/PointStreamData.h"
+#include "Src/PreProcessor.h"
+#include "Src/MyMiscellany.h"
+#include "Src/CmdLineParser.h"
+#include "Src/FEMTree.h"
+#include "Src/PPolynomial.h"
+#include "Src/PointStreamData.h"
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

@@ -853,6 +853,7 @@ if(USE_SYSTEM_CURL)
     if(NOT 3rdparty_curl_FOUND)
         set(USE_SYSTEM_CURL OFF)
     endif()
+
 endif()
 if(NOT USE_SYSTEM_CURL)
     if(USE_SYSTEM_OPENSSL)
@@ -1131,7 +1132,7 @@ list(APPEND Open3D_3RDPARTY_PRIVATE_TARGETS_FROM_CUSTOM Open3D::3rdparty_poisson
 # Minizip
 if(WITH_MINIZIP)
     open3d_pkg_config_3rdparty_library(3rdparty_minizip
-        SEARCH_ARGS minizip
+      SEARCH_ARGS minizip
     )
     list(APPEND Open3D_3RDPARTY_PRIVATE_TARGETS_FROM_SYSTEM Open3D::3rdparty_minizip)
 endif()
@@ -1409,20 +1410,28 @@ list(APPEND Open3D_3RDPARTY_HEADER_TARGETS_FROM_SYSTEM Open3D::3rdparty_opengl)
 
 # CPU Rendering
 if(BUILD_GUI AND UNIX AND NOT APPLE)
-    include(FetchContent)
-    FetchContent_Declare(
-        download_mesa_libgl
-        PREFIX mesa
-        URL https://github.com/isl-org/open3d_downloads/releases/download/mesa-libgl/mesa_libGL_22.1.4.tar.bz2
-        URL_HASH SHA256=5732bfb70e8fcc747018820bc8fd31cd1867ebae5aa09baf65482b42c134d45a
-        DOWNLOAD_DIR "${OPEN3D_THIRD_PARTY_DOWNLOAD_DIR}/mesa"
-        )
-    FetchContent_MakeAvailable(download_mesa_libgl)
+    if(USE_SYSTEM_MESA)
+	open3d_pkg_config_3rdparty_library(
+	    download_mesa_libgl
+	    SEARCH_ARGS libGL=1.2.0 libEGL=1.0.0 REQUIRED
+	)
+    endif()
+    if(NOT USE_SYSTEM_MESA)
+	include(FetchContent)
+	FetchContent_Declare(
+	    download_mesa_libgl
+	    PREFIX mesa
+	    URL https://github.com/isl-org/open3d_downloads/releases/download/mesa-libgl/mesa_libGL_22.1.4.tar.bz2
+	    URL_HASH SHA256=5732bfb70e8fcc747018820bc8fd31cd1867ebae5aa09baf65482b42c134d45a
+	    DOWNLOAD_DIR "${OPEN3D_THIRD_PARTY_DOWNLOAD_DIR}/mesa"
+	    )
+	FetchContent_MakeAvailable(download_mesa_libgl)
 
-    set(MESA_CPU_GL_LIBRARY "${download_mesa_libgl_SOURCE_DIR}/libGL.so.1.2.0" "${download_mesa_libgl_SOURCE_DIR}/libEGL.so.1.0.0"
-        "${download_mesa_libgl_SOURCE_DIR}/libgallium_dri.so" "${download_mesa_libgl_SOURCE_DIR}/kms_swrast_dri.so"
-        "${download_mesa_libgl_SOURCE_DIR}/swrast_dri.so")
-    message(STATUS "MESA_CPU_GL_LIBRARY: ${MESA_CPU_GL_LIBRARY}")
+	set(MESA_CPU_GL_LIBRARY "${download_mesa_libgl_SOURCE_DIR}/libGL.so.1.2.0" "${download_mesa_libgl_SOURCE_DIR}/libEGL.so.1.0.0"
+	    "${download_mesa_libgl_SOURCE_DIR}/libgallium_dri.so" "${download_mesa_libgl_SOURCE_DIR}/kms_swrast_dri.so"
+	    "${download_mesa_libgl_SOURCE_DIR}/swrast_dri.so")
+	message(STATUS "MESA_CPU_GL_LIBRARY: ${MESA_CPU_GL_LIBRARY}")
+    endif()
 endif()
 
 # RPC interface
@@ -1525,16 +1534,17 @@ endif()
 list(APPEND Open3D_3RDPARTY_PRIVATE_TARGETS_FROM_CUSTOM Open3D::3rdparty_vtk)
 
 # UVAtlas
-include(${Open3D_3RDPARTY_DIR}/uvatlas/uvatlas.cmake)
-open3d_import_3rdparty_library(3rdparty_uvatlas
-    HIDDEN
-    INCLUDE_DIRS ${UVATLAS_INCLUDE_DIRS}
-    LIB_DIR      ${UVATLAS_LIB_DIR}
-    LIBRARIES    ${UVATLAS_LIBRARIES}
-    DEPENDS      ext_uvatlas
-)
-list(APPEND Open3D_3RDPARTY_PRIVATE_TARGETS_FROM_CUSTOM Open3D::3rdparty_uvatlas)
-
+if(WITH_UV_ATLAS)
+  include(${Open3D_3RDPARTY_DIR}/uvatlas/uvatlas.cmake)
+  open3d_import_3rdparty_library(3rdparty_uvatlas
+      HIDDEN
+      INCLUDE_DIRS ${UVATLAS_INCLUDE_DIRS}
+      LIB_DIR      ${UVATLAS_LIB_DIR}
+      LIBRARIES    ${UVATLAS_LIBRARIES}
+      DEPENDS      ext_uvatlas
+  )
+  list(APPEND Open3D_3RDPARTY_PRIVATE_TARGETS_FROM_CUSTOM Open3D::3rdparty_uvatlas)
+endif()
 
 if(BUILD_SYCL_MODULE)
     add_library(3rdparty_sycl INTERFACE)
